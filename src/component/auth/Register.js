@@ -1,10 +1,8 @@
 import React,{Fragment,useState} from 'react';
 import {Link} from 'react-router-dom';
-import {connect} from 'react-redux';
-import {setAlert} from '../../actions/alert';
-import PropTypes from 'prop-types';
+import axios from 'axios';
 
-export const Register = ({ setAlert }) => {
+export const Register = () => {
     const [formData, setFormData] = useState({
         name:'',
         email:'',
@@ -15,12 +13,31 @@ export const Register = ({ setAlert }) => {
     const {name, email, password, password2} = formData;
 
     const onChange = e => setFormData({...formData, [e.target.name]: e.target.value});
-    const onSubmit = e => {
+
+
+    const onSubmit = async e => {
       e.preventDefault();
       if(password !== password2){
-        setAlert('Passwords do not match','danger');
+        console.log('Passwords do not match');
       }else{
-        console.log('SUCCES');
+        const newUser = {
+          name,
+          email,
+          password
+        }
+
+        try {
+          const config = {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+          const body = JSON.stringify(newUser); 
+          const res = await axios.post('/api/users', body, config);
+          console.log(res.data);
+        }catch(err) {
+            console.error(err.response.data);
+        }
       }
     }
     return (
@@ -81,8 +98,4 @@ export const Register = ({ setAlert }) => {
     )
 }
 
-Register.propTypes = {
-  setAlert: PropTypes.func.isRequired
-};
-
-export default connect(null, { setAlert })(Register);
+export default Register;

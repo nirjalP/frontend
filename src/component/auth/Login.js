@@ -1,6 +1,6 @@
 import React,{Fragment,useState} from 'react';
 import {Link} from 'react-router-dom';
-
+import axios from 'axios';
 export const Login = () => {
   const [formData, setFormData] = useState({
     email:'',
@@ -10,15 +10,36 @@ export const Login = () => {
 const {email, password} = formData;
 
 const onChange = e => setFormData({...formData, [e.target.name]: e.target.value});
-const onSubmit = e => {
+
+
+const onSubmit = async e => {
   e.preventDefault();
-    console.log("Success!");
+  const User = {
+    email,
+    password
+  }
+
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+    const body = JSON.stringify(User); 
+    const res = await axios.post('/api/auth', body, config);
+    console.log(res.data);
+  }catch(err) {
+      console.error(err.response.data);
+      console.log('Invalid credentials');
+  }
 }
+
+
     return (
         <Fragment>
             <h1 className="large text-primary">Sign In</h1>
       <p className="lead"><i className="fas fa-user"></i> Sign into Your Account</p>
-      <form className="form" action="dashboard.html">
+      <form className="form" onSubmit ={e => onSubmit(e)}>
         <div className="form-group">
           <input
             type="email"
